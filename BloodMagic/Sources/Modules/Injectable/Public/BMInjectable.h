@@ -5,6 +5,9 @@
 
 #import <Foundation/Foundation.h>
 
+#define InjectedClass(aClass) aClass<BMInjectable> *
+#define InjectedProtocol(aProtocol) id <aProtocol, BMInjectable>
+
 @protocol BMInjectable
     <NSObject>
 
