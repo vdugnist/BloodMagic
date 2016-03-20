@@ -7,6 +7,7 @@
 #import "BMDynamicPropertyInjector.h"
 #import "BMPropertyCollector.h"
 #import "BMProperty.h"
+#import "BMInjectable.h"
 
 @implementation BMDynamicPropertyInjector
 
@@ -27,6 +28,10 @@
                                            excludingProtocol:excludingProtocol];
     
     for (BMProperty *property : *properties) {
+        if (![property.protocols containsObject:@protocol(BMInjectable)]) {
+            continue;
+        }
+        
         class_addMethod(klass,
                         property.accessorSelector,
                         property.accessorImplementation,
