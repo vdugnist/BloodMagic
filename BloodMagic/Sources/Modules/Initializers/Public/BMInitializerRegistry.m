@@ -6,7 +6,9 @@
 #import "BMInitializerRegistry.h"
 #import "BMInitializer_Private.h"
 #import "BMInjectableInitializerFinder.h"
+#import "BMInjectable.h"
 #import "BMProperty.h"
+
 
 @implementation BMInitializerRegistry
 {
@@ -44,7 +46,7 @@
 {
     Class rootClass = [NSObject class];
     BOOL propertyHasClass = (property.propertyClass != rootClass);
-    BOOL propertyHasProtocols = (property.protocols != nil);
+    BOOL propertyHasProtocols = (property.protocols.count != 0);
     
     /// TODO: move to BMInitializerFinder
     BMInitializer *initializer = nil;
@@ -53,9 +55,14 @@
         BOOL propertyClassEqual = YES;
         BOOL containerClassEqual = YES;
         
-        if (propertyHasProtocols) {
-            protocolsEqual = [property.protocols isEqualToSet:init.protocolsSet];
-        } else if (init.protocols) {
+        NSSet *macroProtocolsSet = [NSSet setWithObject:@protocol(BMInjectable)];
+        
+        if (propertyHasProtocols && !init.protocols) {
+            protocolsEqual = [property.protocols isEqualToSet:macroProtocolsSet];
+        } else if (propertyHasProtocols) {
+            NSSet *initAndMacroProtocols = [init.protocolsSet setByAddingObjectsFromSet:macroProtocolsSet];
+            protocolsEqual = [property.protocols isEqualToSet:initAndMacroProtocols];
+        } else {
             protocolsEqual = NO;
         }
         
