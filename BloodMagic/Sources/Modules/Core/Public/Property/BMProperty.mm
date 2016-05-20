@@ -133,6 +133,10 @@
 
 - (NSSet *)protocols
 {
+    if (_internalProperty == NULL) {
+        return NULL;
+    }
+    
     return _internalProperty->protocols();
 }
 
