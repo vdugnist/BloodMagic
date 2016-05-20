@@ -31,7 +31,6 @@ void BMPropertyTypeParser::parse(const char *type)
             Protocol *protocol = objc_getProtocol(protocolName.c_str());
             
             if (!protocol) {
-                NSLog(@"BloodMagic: Protocol %s hasn't been found. Please check if you include the header with that protocol description in your .m file", protocolName.c_str());
                 continue;
             }
             

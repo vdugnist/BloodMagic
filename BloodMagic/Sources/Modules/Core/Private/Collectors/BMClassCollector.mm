@@ -40,23 +40,10 @@
 
 - (void)collectClasses
 {
-#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-    uint classesCount;
-    const char *imageName = class_getImageName(object_getClass(self));
-    const char **classNames = objc_copyClassNamesForImage(imageName, &classesCount);
-    for (uint index = 0; index < classesCount; index++) {
-        Class nextClass = objc_getClass(classNames[index]);
-        _cachedClasses.push_back(nextClass);
-    }
-    free(classNames);
-#else
     Class parentClass = [NSObject class];
     int numClasses = objc_getClassList(NULL, 0);
    
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wvla-extension"
-    Class classes[sizeof(Class) * numClasses];
-#pragma clang diagnostic pop   
+    Class *classes = (Class *)malloc(numClasses * sizeof(Class));
    
     numClasses = objc_getClassList(classes, numClasses);
     for (NSInteger i = 0; i < numClasses; i++) {
@@ -70,13 +57,10 @@
         }
 
         Class klass = classes[i];
-
-        if (class_getName(klass)[0] == '_') {
-            continue;
-        }
         _cachedClasses.push_back(klass);
     }
-#endif
+    
+    free(classes);
 }
 
 - (class_list_t *)collectForProtocol:(Protocol *)protocol
